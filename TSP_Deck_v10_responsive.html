@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T-Shirt Project — Deck (TSP Fund 1)</title>
+<style>
+  :root{
+    --bg:#0b0f14; --ink:#e6edf3; --muted:#a6b5c5; --accent:#4cc9f0; --good:#22c55e; --warn:#f59e0b;
+    --card:#121923; --line:#203040;
+  }
+  html,body{height:100%;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Ubuntu,Arial; margin:0}
+  .deck{position:relative; height:100dvh; overflow:hidden}
+  .slides{height:100%; display:flex; transition:transform .5s ease}
+  .slide{min-width:100%; height:100%; box-sizing:border-box; padding:48px 64px; display:flex; flex-direction:column; justify-content:center; gap:18px; position:relative}
+  .slide::before{content:""; position:absolute; inset:0; background-image:radial-gradient(1200px 800px at 110% -10%, rgba(76,201,240,.08), transparent), radial-gradient(900px 600px at -10% 110%, rgba(34,197,94,.06), transparent)}
+  h1,h2{margin:0 0 8px 0}
+  h1{font-size:56px}
+  h2{font-size:40px}
+  p{font-size:20px; color:var(--muted); margin:0}
+  .kpi{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:6px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px}
+  .big{font-size:44px; font-weight:800}
+  ul{font-size:22px; padding-left:22px; margin:6px 0}
+  li{margin:8px 0}
+  .foot{font-size:14px; color:var(--muted); opacity:.8; margin-top:6px}
+  .nav{position:absolute; inset:auto 0 16px 0; display:flex; justify-content:center; gap:10px; pointer-events:none}
+  .dot{width:10px; height:10px; border-radius:999px; background:#2a3b52; pointer-events:auto}
+  .dot.active{background:var(--accent)}
+  .arrow{position:absolute; top:50%; transform:translateY(-50%); width:58px; height:58px; border-radius:50%; border:1px solid var(--line); background:rgba(18,25,35,.7); color:var(--ink); display:grid; place-items:center; font-size:24px; cursor:pointer; user-select:none}
+  .arrow.left{left:18px} .arrow.right{right:18px}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:22px}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+  .grid-5{display:grid; grid-template-columns:repeat(5,1fr); gap:14px}
+  .subtitle{font-size:18px; color:var(--muted)}
+  .headerlogo{position:absolute; top:18px; left:24px; width:180px}
+  .iconrow{display:grid; grid-template-columns:repeat(2,1fr); gap:18px}
+  .icon{display:flex; gap:14px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px}
+  .glyph{width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg, rgba(76,201,240,.25), rgba(34,197,94,.18)); border:1px solid var(--line); display:grid; place-items:center}
+  .glyph svg{width:30px; height:30px}
+  .techstack .card h3{margin:0 0 6px 0; font-size:18px; color:#d3dfed}
+  .techstack .card ul{font-size:16px; padding-left:18px}
+  .timeline{display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-top:8px}
+  .phase{background:var(--card); border:1px dashed var(--line); padding:14px; border-radius:12px; min-height:120px}
+  @media print{.arrow,.nav{display:none} .slide{page-break-after:always}}
+
+  /* === Responsive Enhancements (v10) === */
+  :root{ --tap: 56px; }
+  h1{font-size:clamp(28px, 5.5vw, 56px)}
+  h2{font-size:clamp(22px, 4.8vw, 40px)}
+  p, li{font-size:clamp(14px, 3.8vw, 22px)}
+  .big{font-size:clamp(24px, 6vw, 44px)}
+  .slide{padding:clamp(16px, 4vw, 48px) clamp(14px, 4vw, 64px)}
+  .headerlogo{width:clamp(120px, 28vw, 180px)}
+  .arrow{width:var(--tap); height:var(--tap); font-size:20px; border-radius:14px}
+  .dot{width:12px; height:12px}
+  /* Collapse grids on narrow screens */
+  @media (max-width: 820px){
+    .grid-2, .grid-3, .grid-4, .grid-5, .iconrow, .kpi{grid-template-columns:1fr; gap:14px}
+    .card{padding:14px}
+    ul{padding-left:18px}
+    .slides{scroll-behavior:smooth}
+  }
+  /* Tap zones for mobile: left/right half-screen */
+  .tap-left, .tap-right{
+    position:absolute; top:0; bottom:0; width:50%; z-index:4; display:none;
+  }
+  @media (max-width: 820px){
+    .tap-left, .tap-right{display:block}
+    .tap-left{left:0}
+    .tap-right{right:0}
+  }
+
+</style>
+</head>
+<body>
+<div class="deck">
+  <div class="slides" id="slides">
+
+    <!-- Title -->
+    <section class="slide">
+      <div class="headerlogo">
+        <!-- Inline SVG logo -->
+        <svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="g" x1="0" y="0" x2="1" y="0">
+            <stop offset="0" stop-color="#4cc9f0"/><stop offset="1" stop-color="#22c55e"/>
+          </linearGradient></defs>
+          <rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/>
+          <text x="24" y="44" fill="#e6edf3" font-family="Inter, sans-serif" font-size="38" font-weight="900">TSP</text>
+        </svg>
+      </div>
+      <h1>T-Shirt Project (TSP Fund 1)</h1>
+      <p class="subtitle">Quantitative cotton futures fund • Investor Deck</p>
+      <div class="kpi">
+        <div class="card"><div class="big">~20%</div><div>Target net returns p.a.</div></div>
+        <div class="card"><div class="big">2 &amp; 20</div><div>Fees (HWM)</div></div>
+        <div class="card"><div class="big">Jun/Oct&nbsp;26</div><div>Soft / Main launch</div></div>
+      </div>
+    </section>
+
+    <!-- Why Cotton, Why Now? (dynamic unique icons) -->
+    <section class="slide">
+      <div class="headerlogo">
+        <svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/><text x="24" y="44" fill="#e6edf3" font-size="38" font-weight="900">TSP</text></svg>
+      </div>
+      <h2>Why Cotton, Why Now?</h2>
+      <div class="iconrow">
+        <!-- Target icon -->
+        <div class="icon">
+          <div class="glyph">
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="20" fill="none" stroke="#4cc9f0" stroke-width="3"/>
+              <circle cx="32" cy="32" r="10" fill="none" stroke="#22c55e" stroke-width="3"/>
+              <path d="M8 32 H20 M44 32 H56 M32 8 V20 M32 44 V56" stroke="#4cc9f0" stroke-width="3"/>
+              <path d="M40 18 L56 8 L46 24 Z" fill="#22c55e" opacity=".9"/>
+            </svg>
+          </div>
+          <div><b>Persistent Inefficiencies</b><p>FND microstructure creates recurring, predictable dislocations.</p></div>
+        </div>
+        <!-- Compass icon -->
+        <div class="icon">
+          <div class="glyph">
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="22" fill="none" stroke="#4cc9f0" stroke-width="3"/>
+              <polygon points="32,14 40,40 32,34 24,40" fill="#22c55e"/>
+              <circle cx="32" cy="32" r="3" fill="#4cc9f0"/>
+            </svg>
+          </div>
+          <div><b>Specialist Edge</b><p>Under‑researched niche suited to a focused strategy.</p></div>
+        </div>
+        <!-- Link/plug icon -->
+        <div class="icon">
+          <div class="glyph">
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 42 a10 10 0 0 1 0-20 l6 0" fill="none" stroke="#4cc9f0" stroke-width="3" stroke-linecap="round"/>
+              <path d="M42 22 a10 10 0 0 1 0 20 l-6 0" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
+              <path d="M28 32 h8" stroke="#4cc9f0" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div><b>Dual Advantage</b><p><b>Technology</b> platform + <b>physical market</b> visibility for ground-truth.</p></div>
+        </div>
+        <!-- Growth/alpha icon -->
+        <div class="icon">
+          <div class="glyph">
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+              <polyline points="8,48 20,40 30,44 42,30 56,20" fill="none" stroke="#4cc9f0" stroke-width="3"/>
+              <polygon points="56,20 50,20 56,12" fill="#22c55e"/>
+              <rect x="8" y="48" width="4" height="4" fill="#22c55e"/>
+            </svg>
+          </div>
+          <div><b>Capacity‑Constrained Alpha</b><p>Flow‑driven opportunities around roll/FND windows.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Strategy -->
+    <section class="slide">
+      <div class="headerlogo"><svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/><text x="24" y="44" fill="#e6edf3" font-size="38" font-weight="900">TSP</text></svg></div>
+      <h2>Strategy in One Slide</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Signals</h3>
+          <ul>
+            <li>Derived from <b>custom database & feature store</b>.</li>
+            <li>ML‑enhanced indicators built on Postgres materialized views.</li>
+            <li>Pre‑FND dOI, spreads, volatility, exports, Cotlook, WASDE, <b>and others</b>.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Execution</h3>
+          <ul>
+            <li><b>Calendar spreads</b> as core expression.</li>
+            <li>Size by <b>liquidity & VaR</b>; disciplined risk.</li>
+            <li>Stop‑outs, cooldowns, and exposure caps.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Risk</h3>
+          <ul>
+            <li>VaR & leverage limits.</li>
+            <li>Liquidity stress tests.</li>
+            <li>Independent admin & audit.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technology Stack (expanded) -->
+    <section class="slide">
+      <div class="headerlogo"><svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/><text x="24" y="44" fill="#e6edf3" font-size="38" font-weight="900">TSP</text></svg></div>
+      <h2>Technology Stack</h2>
+      <div class="grid-5 techstack">
+        <div class="card"><h3>Ingestion</h3><ul><li>APIs (USDA, CFTC, Cotlook)</li><li>Web scraping (tables, PDFs)</li><li>Scheduled jobs & retries</li></ul></div>
+        <div class="card"><h3>Pipeline</h3><ul><li>Source → Staging → Prep → Prod</li><li>Metadata <b>Logs</b> & alerting</li><li>Incremental loads</li></ul></div>
+        <div class="card"><h3>Database</h3><ul><li>Postgres, <b>star schema</b></li><li>Partitioned fact tables</li><li>Composite & FK indexes</li></ul></div>
+        <div class="card"><h3>Analytics</h3><ul><li>Materialized views</li><li>Dashboards & BI</li><li>Backtesting engine</li><li><b>~18 proprietary signals</b></li></ul></div>
+        <div class="card"><h3>ML & AI</h3><ul><li>Feature store (MVs)</li><li>Model registry & artifacts</li><li>Streamlit + FastAPI</li></ul></div>
+      </div>
+      <p class="subtitle"><b>Design principle:</b> rapid extensibility — new data points flow into features, analysis, and dashboards with minimal friction.</p>
+    </section>
+
+    <!-- Rapid Data Extensibility -->
+    <section class="slide">
+      <div class="headerlogo"><svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/><text x="24" y="44" fill="#e6edf3" font-size="38" font-weight="900">TSP</text></svg></div>
+      <h2>Rapid Data Extensibility</h2>
+      <div class="grid-2">
+        <div class="card"><h3>How It Works</h3><ul><li>Register new source in <b>Source</b> table.</li><li>Ingestion job auto‑logs run & quality metrics.</li><li>Prep transforms standardize fields & keys.</li><li>Data lands in marts & feature store.</li></ul></div>
+        <div class="card"><h3>Benefits</h3><ul><li>Fast hypothesis testing.</li><li>Minimal refactor to models.</li><li>Immediate visibility in dashboards.</li></ul></div>
+      </div>
+    </section>
+
+    <!-- Machine Learning (kept features wording, no acronyms) -->
+    <section class="slide">
+      <div class="headerlogo"><svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/><text x="24" y="44" fill="#e6edf3" font-size="38" font-weight="900">TSP</text></svg></div>
+      <h2>Machine Learning</h2>
+      <div class="grid-3">
+        <div class="card"><h3>Targets</h3><ul><li>Cumulative dOI in final weeks before FND.</li><li>Spread dislocation probability.</li><li>Market regime classification.</li></ul></div>
+        <div class="card"><h3>Features</h3><ul><li>Lagged CFTC positions by category.</li><li>Spreads, volatility, OI ratios.</li><li>Exports, Cotlook, WASDE.</li></ul></div>
+        <div class="card"><h3>Operations</h3><ul><li>Train on past, test on future windows.</li><li>Track prediction accuracy & error ranges.</li><li>Scheduled predictions → <span style="font-family:ui-monospace,Menlo,Consolas;color:#b8d3f5">predictions_log</span>.</li></ul></div>
+      </div>
+    </section>
+
+    <!-- AI Query Layer -->
+    <section class="slide">
+      <div class="headerlogo"><svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/><text x="24" y="44" fill="#e6edf3" font-size="38" font-weight="900">TSP</text></svg></div>
+      <h2>AI Query Layer — Natural Language Analysis</h2>
+      <div class="grid-2">
+        <div class="card"><h3>What It Does</h3><ul><li>Accepts plain‑English questions and translates to SQL/feature queries.</li><li>Returns tables, charts, and trade checklists.</li><li>Adapts analysis to the current market regime.</li></ul></div>
+        <div class="card"><h3>Examples</h3><ul><li>“Rank weeks by dOI shock before FND since 2015.”</li><li>“Explain divergence between exports and CT1‑CT2 last month.”</li><li>“Backtest: long CT1‑CT2 when managed money flips net long &gt; 80th pct.”</li></ul></div>
+      </div>
+    </section>
+
+    <!-- Delivery Plan -->
+    <section class="slide">
+      <div class="headerlogo"><svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/><text x="24" y="44" fill="#e6edf3" font-size="38" font-weight="900">TSP</text></svg></div>
+      <h2>Delivery Plan — Milestones</h2>
+      <div class="timeline">
+        <div class="phase"><b>Aug ’26</b><ul><li>Core DB v1</li><li>Historical ingest</li><li>Validation</li></ul></div>
+        <div class="phase"><b>Mid‑Sep ’26</b><ul><li>Indicators v1</li><li>Derivative datasets</li></ul></div>
+        <div class="phase"><b>Mid‑Oct ’26</b><ul><li>ML tools v1</li><li>Signal ranking</li></ul></div>
+        <div class="phase"><b>End‑Oct ’26</b><ul><li>Backtests</li><li>Trading dashboard v1</li></ul></div>
+        <div class="phase"><b>Nov ’26–Jan ’27</b><ul><li>Iterate DB/indicators</li><li>Model refinement</li></ul></div>
+        <div class="phase"><b>Feb ’27</b><ul><li>Forward testing</li><li>Begin key hires</li></ul></div>
+        <div class="phase"><b>Mar ’27</b><ul><li>Admin setup</li><li>Go‑live prep</li></ul></div>
+      </div>
+    </section>
+
+    <!-- Terms -->
+    <section class="slide">
+      <div class="headerlogo"><svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="216" height="60" rx="14" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/><text x="24" y="44" fill="#e6edf3" font-size="38" font-weight="900">TSP</text></svg></div>
+      <h2>Fund Terms & Risk</h2>
+      <div class="grid-2">
+        <div class="card"><ul><li>Wholesale MIS (AU).</li><li>2% mgmt / 20% perf (HWM).</li><li>Min AUD 500k • 6‑month lock • Monthly liquidity (ex Feb/Apr/Jun/Nov).</li></ul></div>
+        <div class="card"><h3>Risk Controls</h3><ul><li>VaR & position sizing limits.</li><li>Liquidity stress tests.</li><li>Trade approval & logs.</li></ul></div>
+      </div>
+    </section>
+
+  </div>
+  <div class="arrow left" id="prev">&#x2039;</div>
+  <div class="arrow right" id="next">&#x203A;</div>
+  <div class="nav" id="nav"></div>
+  <div class="tap-left" id="tapLeft"></div>
+  <div class="tap-right" id="tapRight"></div>
+</div>
+
+<script>
+  const slides=document.getElementById('slides');const nav=document.getElementById('nav');const total=slides.children.length;let idx=0;
+  function renderDots(){nav.innerHTML='';for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot'+(i===idx?' active':'');d.addEventListener('click',()=>go(i));nav.appendChild(d);}}
+  function go(i){idx=Math.max(0,Math.min(total-1,i));slides.style.transform=`translateX(${-idx*100}%)`;renderDots();}
+  document.getElementById('next').onclick=()=>go(idx+1);document.getElementById('prev').onclick=()=>go(idx-1);
+  window.addEventListener('keydown',(e)=>{if(e.key==='ArrowRight'||e.key==='PageDown')go(idx+1);if(e.key==='ArrowLeft'||e.key==='PageUp')go(idx-1);if(e.key==='Home')go(0);if(e.key==='End')go(total-1);});
+  window.addEventListener('load',()=>{renderDots();go(0);});
+
+  // Touch swipe navigation
+  let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
+  const threshold = 40; // px
+  slides.addEventListener('touchstart', (e)=>{
+    const t = e.changedTouches[0];
+    touchStartX = t.clientX; touchStartY = t.clientY;
+  }, {passive:true});
+  slides.addEventListener('touchend', (e)=>{
+    const t = e.changedTouches[0];
+    touchEndX = t.clientX; touchEndY = t.clientY;
+    const dx = touchEndX - touchStartX;
+    const dy = touchEndY - touchStartY;
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold){
+      if(dx < 0) go(idx+1); else go(idx-1);
+    }
+  }, {passive:true});
+
+  // Tap zones
+  const tapLeft = document.getElementById('tapLeft');
+  const tapRight = document.getElementById('tapRight');
+  if(tapLeft && tapRight){
+    tapLeft.addEventListener('click', ()=>go(idx-1));
+    tapRight.addEventListener('click', ()=>go(idx+1));
+  }
+
+  // Keep current slide on orientation change
+  window.addEventListener('orientationchange', ()=>{
+    setTimeout(()=>{go(idx);}, 250);
+  });
+
+</script>
+</body>
+</html>
